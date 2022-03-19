@@ -1,0 +1,1 @@
+curl -H @headers --output nqrw_data https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw 
