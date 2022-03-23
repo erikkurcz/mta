@@ -7,5 +7,6 @@ For now the output specification is a command line app that updates in realtime 
 ## Sources
 
 * `*.proto` files are from https://api.mta.info/#/HelpDocument
+* API reference is here: https://api.mta.info/GTFS.pdf
 * protoc is from Google's primary protobuf repo
 
