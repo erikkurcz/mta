@@ -1,0 +1,12 @@
+*.out
+*key*
+*gtfs*
+mta
+data
+headers
+protobufs
+web
+poller.cpp
+*utils*
+current_status*
+TODO*
