@@ -7,12 +7,14 @@
 #include <unistd.h>
 
 #include "file_parser.hh"
+#include "static_data_parser.hh"
 
 struct cli_args {
 	std::string station;
 	std::string direction;
 	std::string route;	
 	std::string filename;	
+	std::string stops_txt_filename;	
 };
 
 static void show_usage(void)
@@ -41,9 +43,9 @@ int main(int argc, char* argv[])
 	{
 		switch (c)
 		{
-			case 's':
+			/*case 's':
 				args.station = optarg;
-				break;
+				break;*/
 			case 'd':
 				args.direction = optarg;
 				break;
@@ -53,6 +55,10 @@ int main(int argc, char* argv[])
 			case 'f':
 				args.filename = optarg;
 				break;
+			case 's':
+                // TODO: default this out, or use config maybe?
+				args.stops_txt_filename = optarg;
+				break;
 		}
 	}
 
@@ -61,14 +67,21 @@ int main(int argc, char* argv[])
 		  << "\nDirection: " << args.direction
 		  << "\nRoute: " << args.route
 		  << "\nFilename: " << args.filename
+		  << "\nStops.txt filename: " << args.stops_txt_filename
 		  << std::endl;
 
-    // Get file here
+    // Get files from MTA here
+    // TODO: this
+
+    // Parse stops.txt
+    StaticData sd;
+    sd.set_stops_txt_filename(args.stops_txt_filename);
+    sd.initialize();
 
 	// parse file here
     FileParser fp;
     fp.set_filepath(args.filename);
-    if (!fp.parse_file()){
+    if (!fp.parse_file(&sd)){
         std::cerr << "Failed to parse: " << args.filename << std::endl;
         return 1;
     }
