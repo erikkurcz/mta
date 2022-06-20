@@ -18,7 +18,7 @@
 #include "protobufs/nyct-subway.pb.h"
 #include "static_data_parser.hh"
 #include "utils.hh"
-#include "structures.hh"
+#include "basic_structures.hh"
 //#include "utils/utils.hh"
 
 class FileParser {

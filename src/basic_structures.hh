@@ -1,10 +1,12 @@
 // Structures used for other components 
-#ifndef MTA_STRUCTURES
-#define MTA_STRUCTURES
+#ifndef MTA_BASIC_STRUCTURES
+#define MTA_BASIC_STRUCTURES
 
 #include <stdlib.h>
 
+#include <iostream>
 #include <string>
+#include <vector>
 
 
 struct PositionInfo{
@@ -23,5 +25,6 @@ struct TripInfo {
     bool is_assigned;
 };
 
+std::ostream& operator<<(std::ostream& os, TripInfo& ti);
 
-#endif // MTA_STRUCTURES header guard
+#endif // MTA_BASIC_STRUCTURES header guard

@@ -5,9 +5,9 @@
 #include <string>
 #include <unistd.h>
 
-#include "file_parser.hh"
-#include "structures.hh"
 #include "static_data_parser.hh"
+#include "file_parser.hh"
+#include "trip_map.hh"
 
 struct cli_args {
 	std::string station;
@@ -94,46 +94,13 @@ int main(int argc, char* argv[])
     std::vector<TripInfo>* trips = fp.get_all_trips();
 
     // Put Trips into a map
-    std::map<std::string, TripInfo> tinfo;
-
-    for (int i = 0; i < trips->size(); i++){
-        TripInfo& tmp = trips->at(i);
-        if (tinfo.count(tmp.trip_id) == 0)
-        {
-            std::cout << "Adding trip info for trip_id: " << tmp.trip_id << std::endl;
-            // Doesn't exist, so just add it
-            tinfo[tmp.trip_id] = tmp;
-        }
-        else 
-        {
-            // Does exist
-            // Let's update the existing if it is a more recent update
-            TripInfo& existing = tinfo[tmp.trip_id];
-            if (tmp.pi.timestamp > existing.pi.timestamp)
-            {
-                // We've come across a more recent update for this trip
-                // Replace what exists in tinfo
-                std::cout << "Found more recent update than existing:\n"
-                          << "\t\tNEW: " << tmp 
-                          << "\n\t\tvs\n"
-                          << "\t\tOLD: " << existing << std::endl;
-                tinfo[tmp.trip_id] = tmp;
-            }
-            else
-            {
-                // Just came across an older update than what exists, so no action needed
-                std::cout << "Found old update, not replacing existing info\n"
-                          << "\t\tEXISTING: " << existing 
-                          << "\n\t\tvs\n"
-                          << "\t\tOLD: " << tmp << std::endl;
-            }
-        }
-    }
+    TripMap tm;
+    tm.add_trips(trips);
 
     // Map is updated with most recent info for all trips
     std::cout << "Map is updated, basic info:\n" 
               << "Total updates in file(s): " << trips->size() << "\n"
-              << "Total unique positions in system: " << tinfo.size() << std::endl;
+              << "Total unique positions in system: " << tm.size() << std::endl;
 	return 0;
 }
 
