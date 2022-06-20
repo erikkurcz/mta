@@ -8,12 +8,13 @@
 #include "static_data_parser.hh"
 #include "file_parser.hh"
 #include "trip_map.hh"
+#include "utils.hh"
 
 struct cli_args {
 	std::string station;
 	std::string direction;
 	std::string route;	
-	std::string filename;	
+    std::vector<std::string> filenames;	
 	std::string stops_txt_filename;	
 };
 
@@ -22,7 +23,8 @@ static void show_usage(void)
 	std::cerr << "Usage:\nmta -s|--station []\n"
 		  << "-d|--direction [north|south]\n"
 		  << "-r|--route [1|2|3|4|5|6|7|S|A|C|E|B|D|F|M|J|Z|G ... \n"
-          << "-f|--filename FILENAME\n"
+          << "-f|--filename FILENAME]\n"
+          << "[-f|--filename FILENAME] ... \n"
 		  << std::endl; 
 }
 
@@ -53,7 +55,7 @@ int main(int argc, char* argv[])
 				args.route = optarg;
 				break;
 			case 'f':
-				args.filename = optarg;
+                args.filenames.push_back(optarg);
 				break;
 			case 's':
                 // TODO: default this out, or use config maybe?
@@ -66,7 +68,7 @@ int main(int argc, char* argv[])
 		  << "\nStation: " << args.station
 		  << "\nDirection: " << args.direction
 		  << "\nRoute: " << args.route
-		  << "\nFilename: " << args.filename
+		  << "\nFilenames: " << args.filenames
 		  << "\nStops.txt filename: " << args.stops_txt_filename
 		  << std::endl;
 
@@ -81,26 +83,37 @@ int main(int argc, char* argv[])
     StaticData sd;
     sd.set_stops_txt_filename(args.stops_txt_filename);
     sd.initialize();
+    
+    // Will contain all trips for all files
+    TripMap tm;
+    std::cout << "Beginning to parse files, TripMap size: " << tm.size() << std::endl;
 
-	// parse file here
-    FileParser fp;
-    fp.set_filepath(args.filename);
-    if (!fp.parse_file(&sd)){
-        std::cerr << "Failed to parse: " << args.filename << std::endl;
-        return 1;
+	// parse file(s) here
+    while (args.filenames.size() > 0)
+    {
+        std::string tmp_filename = args.filenames.back();
+        
+        std::cout << "Parsing file: " << tmp_filename << std::endl;
+        FileParser fp;
+        fp.set_filepath(tmp_filename);
+        if (!fp.parse_file(&sd)){
+            std::cerr << "Parsing file: " << tmp_filename << ", Failed to parse" << std::endl;
+            return 1;
+        }
+
+        // Add to a data structure here and do some work?
+        std::vector<TripInfo>* trips = fp.get_all_trips();
+        std::cout << "Parsing file: " << tmp_filename << ", got " << trips->size() << " trips" << std::endl;
+
+        // Put Trips into map
+        tm.add_trips(trips);
+        std::cout << "Parsing file: " << tmp_filename << ", TripMap size: " << tm.size() << std::endl;
+
+        args.filenames.pop_back();
+
     }
 
-    // Add to a data structure here and do some work?
-    std::vector<TripInfo>* trips = fp.get_all_trips();
-
-    // Put Trips into a map
-    TripMap tm;
-    tm.add_trips(trips);
-
-    // Map is updated with most recent info for all trips
-    std::cout << "Map is updated, basic info:\n" 
-              << "Total updates in file(s): " << trips->size() << "\n"
-              << "Total unique positions in system: " << tm.size() << std::endl;
+    std::cout << "Done parsing files, TripMap size: " << tm.size() << std::endl;
 	return 0;
 }
 
