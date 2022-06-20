@@ -17,7 +17,8 @@
 #include "protobufs/gtfs-realtime.pb.h"
 #include "protobufs/nyct-subway.pb.h"
 #include "static_data_parser.hh"
-
+#include "utils.hh"
+#include "structures.hh"
 //#include "utils/utils.hh"
 
 class FileParser {
@@ -31,8 +32,13 @@ class FileParser {
             return k_filepath;
         }
         bool parse_file(StaticData* sd);
+        std::vector<TripInfo>* get_all_trips()
+        {
+            return &k_all_trips;
+        }
     private:
         std::string k_filepath;
+        std::vector<TripInfo> k_all_trips;
 };
 
 #endif // MTA_FILE_PARSER header guard

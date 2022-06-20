@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include "file_parser.hh"
+#include "structures.hh"
 #include "static_data_parser.hh"
 
 struct cli_args {
@@ -70,8 +71,12 @@ int main(int argc, char* argv[])
 		  << "\nStops.txt filename: " << args.stops_txt_filename
 		  << std::endl;
 
-    // Get files from MTA here
-    // TODO: this
+    // Get files from MTA here if no filename given
+    //if (!args.filename)
+    //{
+    //    // Get data from MTA here
+    //    std::cout << "Getting data from MTA..." << std::endl;
+    //}
 
     // Parse stops.txt
     StaticData sd;
@@ -85,6 +90,10 @@ int main(int argc, char* argv[])
         std::cerr << "Failed to parse: " << args.filename << std::endl;
         return 1;
     }
+
+    // Add to a data structure here and do some work?
+    std::vector<TripInfo>* trips = fp.get_all_trips();
+
 
 	return 0;
 }
