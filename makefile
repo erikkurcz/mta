@@ -3,7 +3,7 @@ GCC=g++
 TARGET=mta
 TARGET_DEBUG=mta_debug
 PROTOBUFS=src/protobufs/gtfs-realtime.pb.cc src/protobufs/nyct-subway.pb.cc
-DEPS=src/static_data_parser.cpp src/file_parser.cpp
+DEPS=src/utils.cpp src/static_data_parser.cpp src/file_parser.cpp
 MAIN=src/main.cpp
 FLAGS=-std=c++11 -lprotobuf
 
