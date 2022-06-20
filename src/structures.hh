@@ -23,4 +23,5 @@ struct TripInfo {
     bool is_assigned;
 };
 
+
 #endif // MTA_STRUCTURES header guard
