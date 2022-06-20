@@ -4,7 +4,7 @@
 
 for ext in ace bdfm g jz nqrw l si "" 
 do
-    NOW=$(date +%H%M)
+    NOW=$(date +%Y%m%d%H%M%S)
     filename_ext=$ext
     if [[ $ext == "" ]]
     then

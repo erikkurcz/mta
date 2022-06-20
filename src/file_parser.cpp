@@ -20,6 +20,7 @@ struct PositionInfo{
 };
 
 struct TripInfo {
+    std::string trip_id;
     std::string direction;
     std::string train_line;
     int hours;
@@ -47,7 +48,7 @@ std::string get_time(time_t unix_timestamp){
 std::ostream& operator<<(std::ostream& os, TripInfo& ti){
     std::stringstream ss;
     ss << (ti.is_assigned ? "+ " : "- ")
-       << "Train: " << ti.direction << " " << ti.train_line 
+       << "Train: " << ti.trip_id << ", " << ti.direction << " " << ti.train_line 
        << " train, departed at: " 
        << std::setfill('0') << std::setw(2) << ti.hours << ":" 
        << std::setfill('0') << std::setw(2) << ti.minutes
@@ -87,6 +88,8 @@ bool get_TripInfo(std::string str, TripInfo& ti){
     // ******* NOTE *******
 
     // Onto the parsing per above rules
+    // Just assign the raw trip_id first
+    ti.trip_id = str;
     
     // origin departure time info
     // remember that it's stored as HUNDREDTHS of minutes past midnight, so convert
