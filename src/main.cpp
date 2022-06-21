@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 
         // Add to a data structure here and do some work?
         std::vector<TripInfo>* trips = fp.get_all_trips();
-        std::cout << "Parsing file: " << tmp_filename << ", got " << trips->size() << " trips" << std::endl;
+        std::cout << "Parsing file: " << tmp_filename << ", got " << trips->size() << " updates" << std::endl;
 
         // Put Trips into map
         tm.add_trips(trips);
