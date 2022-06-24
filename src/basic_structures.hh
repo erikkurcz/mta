@@ -26,5 +26,6 @@ struct TripInfo {
 };
 
 std::ostream& operator<<(std::ostream& os, TripInfo& ti);
+std::ostream& operator<<(std::ostream& os, std::vector<TripInfo>& tiv);
 
 #endif // MTA_BASIC_STRUCTURES header guard
