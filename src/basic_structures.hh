@@ -25,7 +25,11 @@ struct TripInfo {
     bool is_assigned;
 };
 
+typedef std::vector<TripInfo> TripInfoVec;
 std::ostream& operator<<(std::ostream& os, TripInfo& ti);
-std::ostream& operator<<(std::ostream& os, std::vector<TripInfo>& tiv);
+std::ostream& operator<<(std::ostream& os, TripInfoVec& tiv);
+
+bool operator==(TripInfo& left, TripInfo& right);
+bool operator!=(TripInfo& left, TripInfo& right);
 
 #endif // MTA_BASIC_STRUCTURES header guard
