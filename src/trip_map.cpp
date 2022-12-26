@@ -26,6 +26,7 @@ bool TripMap::add_trip(TripInfo new_ti)
         // ie daemon usage
 
         // Let's insert the record into the correct spot in the vector
+        std::cout << "Adding additional trip info for existing trip_id: " << new_ti.trip_id << std::endl;
         TripInfoVec& tiv_existing = k_trip_map[new_ti.trip_id];
 
         // Find correct spot
@@ -35,14 +36,18 @@ bool TripMap::add_trip(TripInfo new_ti)
         {
             TripInfo tmp = *itr;
             if (tmp.pi.timestamp > new_ti.pi.timestamp)
-            {
+            { 
+                // Iter to next location, this isn't where we should insert
+                std::cout << "Additional TripInfo: itering again on timestamp:\n" 
+                          << "tmp:\t" << tmp << "\nnew:\t" << new_ti << std::endl;
                 itr++;
             }
             else
             {
                 // Check if duplicate
                 if (new_ti == tmp){
-                    std::cout << "Duplicate trip, discarding" << std::endl;
+                    std::cout << "Duplicate trip, discarding\n" 
+                              << "tmp:\t" << tmp << "\nnew:\t" << new_ti << std::endl;
                     itr++;
                 }
                 else
