@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "static_data_parser.hh"
 
@@ -57,6 +58,21 @@ void StaticData::initialize(){
 }
 
 StopName StaticData::get_stop_name(StopId sid){
+
+    // We aren't necessarily guaranteed a StopID to be present here...
+    // I've seen 'R60N' be given as a StopID, which is not present in stops.txt
+    // Nor is it present on a newer version of static data from the MTA
+    // So we'll return a blank StopName and require the caller to handle this
+    // If the id isn't found
+
+    // StopName is just a string anyway
+    StopName sname;
+    if (!stopmap_ptr->count(sid))
+    {
+        std::cerr << "ERROR: StopID '" << sid << "' not found in stops.txt!" << std::endl;
+        return sname;
+    }
+
     return stopmap_ptr->find(sid)->second;
 }
 
