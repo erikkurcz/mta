@@ -5,45 +5,67 @@
 #include "trip_map.hh"
 
 
-bool TripMap::add_trip(TripInfo ti)
+bool TripMap::add_trip(TripInfo new_ti)
 {
-    if (k_trip_map.count(ti.trip_id) == 0)
+    if (k_trip_map.count(new_ti.trip_id) == 0)
     {
-        std::cout << "Adding trip info for trip_id: " << ti.trip_id << std::endl;
         // Doesn't exist, so just add it
-        k_trip_map[ti.trip_id] = ti;
+        std::cout << "Adding trip info for new trip_id: " << new_ti.trip_id << std::endl;
+        TripInfoVec tiv;
+        tiv.push_back(new_ti);
+        k_trip_map[new_ti.trip_id] = tiv;
         return true;
     }
     else 
     {
-        // Does exist
-        // Let's update the existing if it is a more recent update
-        TripInfo& existing = k_trip_map[ti.trip_id];
-        if (ti.pi.timestamp > existing.pi.timestamp)
+        // Does exist - that is, a TripInfoVec for this TripId exists
+        // We are therefore receiving a second update for an existing trip,
+        // and will store it in chronological order relative to others
+        // This will be rare when parsing a single file
+        // But if using multiple files, will see many subsequent updates
+        // ie daemon usage
+
+        // Let's insert the record into the correct spot in the vector
+        TripInfoVec& tiv_existing = k_trip_map[new_ti.trip_id];
+
+        // Find correct spot
+        // Guaranteed at least 1 item here
+        TripInfoVec::iterator itr = tiv_existing.begin();
+        while (itr != tiv_existing.end())
         {
-            // We've come across a more recent update for this trip
-            // Replace what exists in k_trip_map
-            std::cout << "Found more recent update than existing:\n"
-                      << "\t\tNEW: " << ti 
-                      << "\n\t\tvs\n"
-                      << "\t\tOLD: " << existing << std::endl;
-            k_trip_map[ti.trip_id] = ti;
-            return true;
+            TripInfo tmp = *itr;
+            if (tmp.pi.timestamp > new_ti.pi.timestamp)
+            {
+                itr++;
+            }
+            else
+            {
+                // Check if duplicate
+                if (new_ti == tmp){
+                    std::cout << "Duplicate trip, discarding" << std::endl;
+                    itr++;
+                }
+                else
+                {
+                    std::cout << "Found insert point:\n\t" << tmp << "\n\tfor new_ti:\n\t" << new_ti << std::endl;
+                    // Will have not itered if it is newest update
+                    tiv_existing.insert(itr, new_ti);
+                    break;
+                }
+
+            }
         }
-        else
-        {
-            // Just came across an older update than what exists, so no action needed
-            std::cout << "Found old update, not replacing existing info\n"
-                      << "\t\tEXISTING: " << existing 
-                      << "\n\t\tvs\n"
-                      << "\t\tOLD: " << ti << std::endl;
-            return false;
-        }
+
+
+        return true;
     }
 }
 
 void TripMap::add_trips(std::vector<TripInfo>* trips)
 {
+    // Considering each trip as an independent item here
+    // Even though we do maintain vectors of TripInfo objects 
+    //   for a single trip in the underlying structure
     for (int i = 0; i < trips->size(); i++){
         add_trip(trips->at(i));
     }
