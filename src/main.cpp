@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
                 args.filenames.push_back(optarg);
 				break;
 			case 's':
-                // TODO: default this out, or use config maybe?
-				args.stops_txt_filename = optarg;
+                // TODO: default this out, or use config maybe?  
+                args.stops_txt_filename = optarg;
 				break;
 		}
 	}
