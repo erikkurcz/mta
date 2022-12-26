@@ -66,7 +66,7 @@ StopName StaticData::get_stop_name(StopId sid){
     // If the id isn't found
 
     // StopName is just a string anyway
-    StopName sname;
+    StopName sname("UNKNOWN");
     if (!stopmap_ptr->count(sid))
     {
         std::cerr << "ERROR: StopID '" << sid << "' not found in stops.txt!" << std::endl;
