@@ -89,11 +89,12 @@ int main(int argc, char* argv[])
     std::cout << "Beginning to parse files, TripMap size: " << tm.size() << std::endl;
 
 	// parse file(s) here
+    // quick hack
+    std::string a_trip_id;
     while (args.filenames.size() > 0)
     {
         std::string tmp_filename = args.filenames.back();
         
-        std::cout << "Parsing file: " << tmp_filename << std::endl;
         FileParser fp;
         fp.set_filepath(tmp_filename);
         if (!fp.parse_file(&sd)){
@@ -103,17 +104,42 @@ int main(int argc, char* argv[])
 
         // Add to a data structure here and do some work?
         std::vector<TripInfo>* trips = fp.get_all_trips();
-        std::cout << "Parsing file: " << tmp_filename << ", got " << trips->size() << " updates" << std::endl;
+        std::cout << "Starting to parse file: " << tmp_filename << ", got " << trips->size() << " updates" << std::endl;
 
         // Put Trips into map
+        a_trip_id = (*trips)[0].trip_id;
         tm.add_trips(trips);
-        std::cout << "Parsing file: " << tmp_filename << ", TripMap size: " << tm.size() << std::endl;
+        std::cout << "Done parsing file: " << tmp_filename << ", TripMap size: " << tm.size() << std::endl;
 
         args.filenames.pop_back();
 
     }
 
+    // TripMap is string is unique {tripid:[vector of trip updates]}
+    // We can iter it and find trips with > 1 update and dump their updates in chrono order!
+    TripMap::TripMapIterator it;
+    it = tm.begin();
+    while (it != tm.end())
+    {
+        if (it->second.size() > 1)
+        {
+            std::cout << "Found trip with >1 update:\n" << std::endl;
+            for (int i = 0; i < it->second.size(); i++)
+            {
+                std::cout << it->second[i] << std::endl;
+            }
+        }
+        it++;
+    }
+
+
     std::cout << "Done parsing files, TripMap size: " << tm.size() << std::endl;
+
+    std::cout << "Dumping single trip: " << a_trip_id << std::endl;
+    TripInfoVec vec_of_a_trip = tm.get_trips(a_trip_id);
+    std::cout << vec_of_a_trip << std::endl;
+
+
 	return 0;
 }
 
