@@ -11,7 +11,7 @@ all:
 	$(GCC) -o $(TARGET) $(PROTOBUFS) $(DEPS) $(MAIN) $(FLAGS)
 
 debug:
-	$(GCC) -g -o $(TARGET_DEBUG) $(PROTOBUFS) $(DEPS) $(MAIN) $(FLAGS)
+	$(GCC) -g -o $(TARGET_DEBUG) -DDEBUG $(PROTOBUFS) $(DEPS) $(MAIN) $(FLAGS)
 
 clean:
 	rm *.o $(TARGET) $(TARGET_DEBUG)
