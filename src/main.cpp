@@ -5,6 +5,9 @@
 #include <string>
 #include <unistd.h>
 
+#include "log4cxx/logger.h"
+#include "log4cxx/basicconfigurator.h"
+
 #include "static_data_parser.hh"
 #include "file_parser.hh"
 #include "trip_map.hh"
@@ -27,6 +30,9 @@ static void show_usage(void)
           << "[-f|--filename FILENAME] ... \n"
 		  << std::endl; 
 }
+
+// Set up logger
+log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("mta_app"));
 
 int main(int argc, char* argv[])
 {
@@ -64,13 +70,16 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	std::cout << "Arguments given:"
-		  << "\nStation: " << args.station
-		  << "\nDirection: " << args.direction
-		  << "\nRoute: " << args.route
-		  << "\nFilenames: " << args.filenames
-		  << "\nStops.txt filename: " << args.stops_txt_filename
-		  << std::endl;
+    log4cxx::BasicConfigurator::configure();
+	LOG4CXX_INFO(logger, "Test");
+    std::stringstream msg;
+    msg << "Arguments given:"
+        << "\nStation: " << args.station
+        << "\nDirection: " << args.direction
+        << "\nRoute: " << args.route
+        << "\nFilenames: " << args.filenames
+        << "\nStops.txt filename: " << args.stops_txt_filename << std::endl;
+    LOG4CXX_INFO(logger, msg.str());
 
     // Get files from MTA here if no filename given
     //if (!args.filename)
