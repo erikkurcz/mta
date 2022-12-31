@@ -3,7 +3,11 @@
 #include <sstream>
 #include <iostream>
 
+#include "log4cxx/logger.h"
+
 #include "static_data_parser.hh"
+
+log4cxx::LoggerPtr stopmap_logger(log4cxx::Logger::getLogger("mta.StopMap"));
 
 StopIdNameMap* get_stop_map(std::string filename){
     // Parses stops.txt file, given as a filename to the function
@@ -70,7 +74,7 @@ StopName StaticData::get_stop_name(StopId sid){
     {
         StopName sname("UNKNOWN: ");
         sname += sid;
-        std::cerr << "ERROR: StopID '" << sid << "' not found in stops.txt!" << std::endl;
+        LOG4CXX_ERROR(stopmap_logger, "ERROR: StopID '" << sid << "' not found in stops.txt!");
         return sname;
     }
 
