@@ -7,7 +7,7 @@
 #include "basic_structures.hh"
 #include "time_parser.hh"
 
-std::ostream& operator<<(std::ostream& os, TripInfo& ti){
+std::ostream& operator<<(std::ostream& os, const TripInfo& ti){
     std::stringstream ss;
     ss << (ti.is_assigned ? "+ " : "- ")
        << "Train: " << ti.trip_id << ", " << ti.direction << " " << ti.train_line 
@@ -20,7 +20,7 @@ std::ostream& operator<<(std::ostream& os, TripInfo& ti){
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, TripInfoVec& tiv){
+std::ostream& operator<<(std::ostream& os, const TripInfoVec& tiv){
     std::stringstream ss;
     for (int i = 0; i < tiv.size(); i++){
         ss << "\n\t" << tiv[i];

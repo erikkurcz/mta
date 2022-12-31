@@ -26,8 +26,8 @@ struct TripInfo {
 };
 
 typedef std::vector<TripInfo> TripInfoVec;
-std::ostream& operator<<(std::ostream& os, TripInfo& ti);
-std::ostream& operator<<(std::ostream& os, TripInfoVec& tiv);
+std::ostream& operator<<(std::ostream& os, const TripInfo& ti);
+std::ostream& operator<<(std::ostream& os, const TripInfoVec& tiv);
 
 bool operator==(TripInfo& left, TripInfo& right);
 bool operator!=(TripInfo& left, TripInfo& right);
