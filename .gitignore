@@ -11,3 +11,4 @@ poller.cpp
 current_status*
 TODO*
 mta_debug
+log4cxx

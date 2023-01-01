@@ -1424,6 +1424,12 @@ R44S,,86 St,,40.622687,-74.028398,,,0,R44
 R45,,Bay Ridge-95 St,,40.616622,-74.030876,,,1,
 R45N,,Bay Ridge-95 St,,40.616622,-74.030876,,,0,R45
 R45S,,Bay Ridge-95 St,,40.616622,-74.030876,,,0,R45
+R60,,Queensboro Bridge 11th Street Cut,,40.753323,-73.946537,,,0,R60
+R60N,,Queensboro Bridge 11th Street Cut,,40.753323,-73.946537,,,0,R60
+R60S,,Queensboro Bridge 11th Street Cut,,40.753323,-73.946537,,,0,R60
+R65,,Montague Tunnel (Manhattan-Brooklyn),,40.698056,-74.005556,,,0,R65
+R65N,,Montague Tunnel (Manhattan-Brooklyn),,40.698056,-74.005556,,,0,R65
+R65S,,Montague Tunnel (Manhattan-Brooklyn),,40.698056,-74.005556,,,0,R65
 S01,,Franklin Av,,40.680596,-73.955827,,,1,
 S01N,,Franklin Av,,40.680596,-73.955827,,,0,S01
 S01S,,Franklin Av,,40.680596,-73.955827,,,0,S01

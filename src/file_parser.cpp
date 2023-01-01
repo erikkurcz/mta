@@ -11,8 +11,11 @@
 #include <sstream>
 #include <string>
 
+#include "log4cxx/logger.h"
+
 #include "file_parser.hh"
 
+log4cxx::LoggerPtr fileparser_logger(log4cxx::Logger::getLogger("mta.FileParser"));
 
 // Parse file into protobuf objects
 bool FileParser::parse_file(StaticData* sd)
@@ -25,14 +28,14 @@ bool FileParser::parse_file(StaticData* sd)
 
         if (!data)
         {
-            std::cerr << "Error opening file: " << k_filepath << ", error: " << strerror(errno) << std::endl;
+            LOG4CXX_ERROR(fileparser_logger, "Error opening file: " << k_filepath << ", error: " << strerror(errno));
             return false;
         }
         
         transit_realtime::FeedMessage fmessage;
         if (!fmessage.ParseFromIstream(&data))
         {
-            std::cerr << "Error parsing file: " << k_filepath << ", error: " << strerror(errno) << std::endl;
+            LOG4CXX_ERROR(fileparser_logger, "Error parsing file: " << k_filepath << ", error: " << strerror(errno));
             return false;
         }
         
@@ -80,7 +83,6 @@ bool FileParser::parse_file(StaticData* sd)
                     }
                     k_all_trips.push_back(ti);
                 }
-                
 
                 // TripUpdate parsing for this same Trip!
             }
@@ -91,21 +93,14 @@ bool FileParser::parse_file(StaticData* sd)
         std::sort(k_all_trips.begin(), k_all_trips.end(), sortDepartureTime);
 
         for (int i = 0; i < k_all_trips.size(); i++){
-            std::cout << k_all_trips[i] << std::endl;
+            LOG4CXX_DEBUG(fileparser_logger, k_all_trips[i]);
         }
         
-        // TODO: decided what to do with the below, presently unused and might not need to be
-        // We don't necessarily need JSON, can just use C++ structures etc
-        // Maybe will need to create our own structures of what we care about for subsequent analysis 
-        // good to go from here
-        //std::string json;
-        //google::protobuf::util::MessageToJsonString(trip_descriptions, &json);
-        //std::cout << json << std::endl;
-        std::cout << "Num trips in this file: " << k_all_trips.size() << std::endl;
+        LOG4CXX_INFO(fileparser_logger, "Num trips in this file: " << k_all_trips.size());
     }
     else 
     {
-        std::cerr << "k_filepath has no size! Nothing to parse. k_filepath: '" << k_filepath << "'" << std::endl;
+        LOG4CXX_ERROR(fileparser_logger, "k_filepath has no size! Nothing to parse. k_filepath: '" << k_filepath << "'");
         return false;
     }
 	return true;	

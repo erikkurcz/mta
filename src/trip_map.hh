@@ -8,7 +8,10 @@
 #include <string>
 #include <vector>
 
+#include "log4cxx/logger.h"
+
 #include "basic_structures.hh"
+
 
 class TripMap{
     public:
