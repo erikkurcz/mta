@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #include "log4cxx/logger.h"
-#include "log4cxx/basicconfigurator.h"
+#include "log4cxx/propertyconfigurator.h"
 
 #include "static_data_parser.hh"
 #include "file_parser.hh"
@@ -17,6 +17,7 @@ struct CLIArgs {
 	std::string station;
 	std::string direction;
 	std::string route;	
+	std::string log_config;	
     std::vector<std::string> filenames;	
 	std::string stops_txt_filename;	
 };
@@ -27,6 +28,7 @@ std::ostream& operator<<(std::ostream& os, const struct CLIArgs& args)
     os << "direction = " << args.direction << ", ";
     os << "route = " << args.route << ", ";
     os << "stops_txt_filename = " << args.stops_txt_filename << ", ";
+    os << "log_config = " << args.log_config << ", ";
     os << "data_filenames = ";
 
     for (int i = 0; i < args.filenames.size(); i++)
@@ -41,13 +43,13 @@ static void show_usage(void)
 	std::cerr << "Usage:\nmta -s|--station []\n"
 		  << "-d|--direction [north|south]\n"
 		  << "-r|--route [1|2|3|4|5|6|7|S|A|C|E|B|D|F|M|J|Z|G ... \n"
-          << "-f|--filename FILENAME]\n"
+          << "-l|--log-config LOG_CONFIG_FILENAME\n"
+          << "-f|--filename FILENAME\n"
           << "[-v|--verbose]"
 		  << std::endl; 
 }
 
-// Set up logger
-log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("mta"));
+log4cxx::LoggerPtr main_logger(log4cxx::Logger::getLogger("mta"));
 
 int main(int argc, char* argv[])
 {
@@ -60,13 +62,11 @@ int main(int argc, char* argv[])
 		return 1; 
 	}
 
-    log4cxx::BasicConfigurator::configure();
-    LOG4CXX_INFO(logger, "Arguments given:" << args);
-    logger->setLevel(log4cxx::Level::getInfo());
-	
+    bool set_log_debug(false);
+
 	// parse out	
 	int c;	
-	while((c = getopt(argc, argv, "s:d:r:v::f:")) != -1 )
+	while((c = getopt(argc, argv, "s:d:r:l:v::f:")) != -1 )
 	{
 		switch (c)
 		{
@@ -79,6 +79,11 @@ int main(int argc, char* argv[])
 			case 'r':
 				args.route = optarg;
 				break;
+			case 'l':
+                // Set up logger from file
+				args.log_config = optarg;
+                log4cxx::PropertyConfigurator::configure(args.log_config);
+				break;
 			case 'f':
                 args.filenames.push_back(optarg);
 				break;
@@ -87,11 +92,17 @@ int main(int argc, char* argv[])
                 args.stops_txt_filename = optarg;
 				break;
 			case 'v':
-                logger->setLevel(log4cxx::Level::getDebug());
+                set_log_debug = true;
 				break;
 		}
 	}
 
+    if (set_log_debug)
+    {
+        main_logger->setLevel(log4cxx::Level::getDebug());
+    }
+
+    LOG4CXX_INFO(main_logger, "Arguments given:" << args);
     // Get files from MTA here if no filename given
     //if (!args.filename)
     //{
@@ -106,7 +117,7 @@ int main(int argc, char* argv[])
     
     // Will contain all trips for all files
     TripMap tm;
-    LOG4CXX_INFO(logger, "Beginning to parse files, TripMap size: " << tm.size());
+    LOG4CXX_INFO(main_logger, "Beginning to parse files, TripMap size: " << tm.size());
 
 	// parse file(s) here
     // quick hack
@@ -118,18 +129,18 @@ int main(int argc, char* argv[])
         FileParser fp;
         fp.set_filepath(tmp_filename);
         if (!fp.parse_file(&sd)){
-            LOG4CXX_ERROR(logger, "Failed to parse: " << tmp_filename);
+            LOG4CXX_ERROR(main_logger, "Failed to parse: " << tmp_filename);
             return 1;
         }
 
         // Add to a data structure here and do some work?
         std::vector<TripInfo>* trips = fp.get_all_trips();
-        LOG4CXX_DEBUG(logger, "Starting to parse file: " << tmp_filename << ", got " << trips->size() << " updates");
+        LOG4CXX_DEBUG(main_logger, "Starting to parse file: " << tmp_filename << ", got " << trips->size() << " updates");
 
         // Put Trips into map
         a_trip_id = (*trips)[0].trip_id;
         tm.add_trips(trips);
-        LOG4CXX_DEBUG(logger, "Done parsing file: " << tmp_filename << ", TripMap size: " << tm.size());
+        LOG4CXX_DEBUG(main_logger, "Done parsing file: " << tmp_filename << ", TripMap size: " << tm.size());
 
         args.filenames.pop_back();
 
@@ -143,21 +154,15 @@ int main(int argc, char* argv[])
     {
         if (it->second.size() > 1)
         {
-            std::stringstream msg("Found trip with >1 update: ");
-            for (int i = 0; i < it->second.size(); i++)
-            {
-                msg << it->second[i];
-                msg << "\n";
-            }
-            LOG4CXX_INFO(logger, msg.str());
+            LOG4CXX_INFO(main_logger, "Found trip with >1 update: " << it->second);
         }
         it++;
     }
 
-    LOG4CXX_INFO(logger, "Done parsing files, TripMap size: " << tm.size());
+    LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
 
     TripInfoVec vec_of_a_trip = tm.get_trips(a_trip_id);
-    LOG4CXX_INFO(logger, "Dumping single trip, trip_id: " << a_trip_id << ", updates: " << vec_of_a_trip);
+    LOG4CXX_INFO(main_logger, "Dumping single trip, trip_id: " << a_trip_id << ", updates: " << vec_of_a_trip);
 
 
 	return 0;

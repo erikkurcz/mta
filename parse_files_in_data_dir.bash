@@ -8,7 +8,7 @@ do
     ALL_FILES="$ALL_FILES -f data/$file" 
 done
 
-echo "bash -c \"./mta $ALL_FILES -s mta_static_data/stops.txt >> current_status_all_lines\""
-bash -c "./mta $ALL_FILES -s mta_static_data/stops.txt >> current_status_all_lines"
+echo "bash -c \"./mta $ALL_FILES -l log_config.txt -s mta_static_data/stops.txt >> current_status_all_lines\""
+bash -c "./mta $ALL_FILES -l log_config.txt -s mta_static_data/stops.txt >> current_status_all_lines"
 
 echo "done"
