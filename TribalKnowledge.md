@@ -18,3 +18,8 @@ There are at least 2 Unknown StopIDs: `R60` and `R65`. These show up in the feed
  
 I'll likely either ignore these, or add an extension to `stops.txt` for my own purposes because even if neither is a station, it's interesting data. I'd guess the time to cross the tunnel is a few minutes more than most intra-station times anyway, so could be another piece of data to add in, even if questionably reliable.
 
+## The `H` line
+
+* The H line was an earlier (not the only, and not the earliest) designation for what is now known as the Rockaway Park Shuttle, out in Queens. It's still listed as the H line in the data, even though most people would recognize it only by the S with a superscript R, like S^R. The superscript distinguishes it from the plain S line, which is the Grand Central Shuttle, and the S^F line, which is the Franklin Avenue Shuttle.
+* More here: https://en.wikipedia.org/wiki/Rockaway_Park_Shuttle
+
