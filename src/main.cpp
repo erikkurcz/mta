@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <string>
 #include <unistd.h>
-
-#include "log4cxx/logger.h"
+#include "log4cxx/logger.h" 
 #include "log4cxx/propertyconfigurator.h"
 
 #include "static_data_parser.hh"
@@ -146,24 +145,23 @@ int main(int argc, char* argv[])
 
     }
 
-    // TripMap is string is unique {tripid:[vector of trip updates]}
-    // We can iter it and find trips with > 1 update and dump their updates in chrono order!
+    // Find the trip with the most updates and print it
     TripMap::TripMapIterator it;
+    TripMap::TripMapIterator trip_with_most_updates;
     it = tm.begin();
+    
+    size_t largest_seen = 0;
     while (it != tm.end())
     {
-        if (it->second.size() > 1)
+        if (it->second.size() > largest_seen)
         {
-            LOG4CXX_INFO(main_logger, "Found trip with >1 update: " << it->second);
+            largest_seen = it->second.size();
+            trip_with_most_updates = it;
         }
         it++;
     }
-
+    LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
     LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
-
-    TripInfoVec vec_of_a_trip = tm.get_trips(a_trip_id);
-    LOG4CXX_INFO(main_logger, "Dumping single trip, trip_id: " << a_trip_id << ", updates: " << vec_of_a_trip);
-
 
 	return 0;
 }
