@@ -1,0 +1,13 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station
+R60,,Queensboro Bridge,,40.616622,-74.030876,,,0,R60
+R60N,,Queensboro Bridge,,40.616622,-74.030876,,,0,R60
+R60S,,Queensboro Bridge,,40.616622,-74.030876,,,0,R60
+R65,,R-train Manhattan-Brooklyn Tunnel,,40.616622,-74.030876,,,0,R65
+R65N,,R-train Manhattan-Brooklyn Tunnel,,40.616622,-74.030876,,,0,R65
+R65S,,R-train Manhattan-Brooklyn Tunnel,,40.616622,-74.030876,,,0,R65
+R60,,Queensboro Bridge 11th Street Cut,,40.753323,-73.946537,,,0,R60
+R60N,,Queensboro Bridge 11th Street Cut,,40.753323,-73.946537,,,0,R60
+R60S,,Queensboro Bridge 11th Street Cut,,40.753323,-73.946537,,,0,R60
+R65,,Montague Tunnel (Manhattan-Brooklyn),,40.698056,-74.005556,,,0,R65
+R65N,,Montague Tunnel (Manhattan-Brooklyn),,40.698056,-74.005556,,,0,R65
+R65S,,Montague Tunnel (Manhattan-Brooklyn),,40.698056,-74.005556,,,0,R65

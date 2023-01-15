@@ -96,7 +96,7 @@ bool FileParser::parse_file(StaticData* sd)
             LOG4CXX_DEBUG(fileparser_logger, k_all_trips[i]);
         }
         
-        LOG4CXX_INFO(fileparser_logger, "Count of trips in file: " << k_filepath << ": " << k_all_trips.size());
+        LOG4CXX_DEBUG(fileparser_logger, "Count of trips in file: " << k_filepath << ": " << k_all_trips.size());
     }
     else 
     {

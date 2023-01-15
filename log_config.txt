@@ -1,9 +1,15 @@
-# Set root logger level to DEBUG and its only appender to A1.
-log4j.rootLogger=INFO, A1
+# Set root logger level to DEBUG and its only appenders
+log4j.rootLogger=INFO, STDOUT, LOGFILE
 
-# A1 is set to be a ConsoleAppender.
-log4j.appender.A1=org.apache.log4j.ConsoleAppender
+# STDOUT is set to be a ConsoleAppender.
+log4j.appender.STDOUT=org.apache.log4j.ConsoleAppender
 
-# A1 uses PatternLayout.
-log4j.appender.A1.layout=org.apache.log4j.PatternLayout
-log4j.appender.A1.layout.ConversionPattern=%-4r [tid: %t] %-5p - %m%n
+# LOGFILE is set to be a ConsoleAppender.
+log4j.appender.LOGFILE=org.apache.log4j.FileAppender
+log4j.appender.LOGFILE.FILE=mta.log
+
+# Both appenders use PatternLayout.
+log4j.appender.STDOUT.layout=org.apache.log4j.PatternLayout
+log4j.appender.STDOUT.layout.ConversionPattern=%-4r [tid: %t] %-5p - %m%n
+log4j.appender.LOGFILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.LOGFILE.layout.ConversionPattern=%-4r [tid: %t] %-5p - %m%n
