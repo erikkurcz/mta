@@ -163,7 +163,43 @@ int main(int argc, char* argv[])
     LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
     LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
 
+    // Now that the stuff is loaded, let's allow the user to query
+    // I guess we'll need an index at some point, 
+    // but for now let's go on the basis of stations and just iter the TripMap
+    // We can optimize for read later on, and have map of stations -> trains in the future
+    // Or even a map of stations -> expected trains in N minutes (which is really what is useful)
+    // But for now: simple query
+    
+    std::string input;
+    it = tm.begin();
+    std::cout << "Enter serch query (or 'exit'): " << std::endl;
+    while (std::getline(std::cin, input))
+    {
+        // While we read input fine and it's not 'exit'
+        // continue taking search terms
+        if (input.compare("exit") == 0)
+        {
+            std::cout << "you've exited, bye!" << std::endl;
+            break;
+        }
 
+        // Print the results and clear results for next search
+        std::cout << "Results for search term: " << input << "\n";
+        while (it != tm.end())
+        {
+            // magic number: 0 index is most recent update
+            if (it->second[0].pi.current_stop.find(input) != std::string::npos) 
+            {
+                std::cout << '\t' << it->second[0] << '\n';
+            }
+            it++;
+        }
+
+        // Clear out input
+        input.clear();
+        it = tm.begin();
+        std::cout << "Enter serch query (or 'exit'): " << std::endl;
+    }
 
 	return 0;
 }
