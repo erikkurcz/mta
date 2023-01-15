@@ -78,6 +78,7 @@ bool FileParser::parse_file(StaticData* sd)
                     // Combine this with timestamp to know where it is and when
                     if (vehicle_pos.has_stop_id()){
                         // Train is at a station, parse where it is and the timestamp
+                        ti.pi.current_stop_id = vehicle_pos.stop_id();
                         ti.pi.current_stop = sd->get_stop_name(vehicle_pos.stop_id());
                         ti.pi.timestamp = vehicle_pos.has_timestamp() ? vehicle_pos.timestamp() : -1;
                     }

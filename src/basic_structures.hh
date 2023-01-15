@@ -10,6 +10,7 @@
 
 
 struct PositionInfo{
+    std::string current_stop_id;
     std::string current_stop;
     int timestamp;
 };
