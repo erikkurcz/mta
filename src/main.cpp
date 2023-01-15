@@ -163,6 +163,8 @@ int main(int argc, char* argv[])
     LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
     LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
 
+
+
 	return 0;
 }
 
