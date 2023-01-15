@@ -10,6 +10,7 @@
 #include "static_data_parser.hh"
 #include "file_parser.hh"
 #include "trip_map.hh"
+#include "query_interface.hh"
 #include "utils.hh"
 
 struct CLIArgs {
@@ -163,8 +164,7 @@ int main(int argc, char* argv[])
     LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
     LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
 
-
-
+    query_tripmap(tm); 
 	return 0;
 }
 
