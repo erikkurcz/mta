@@ -121,10 +121,11 @@ std::vector<std::string> get_mta_data()
     {
         if (extensions[i] == std::string("1234567"))
         {
-            // special case for 1234567, url does not have a '-' after gtfs
+            // special case for 1234567
+            // The url does not have a line specifier!
             tmpurl = url;
-            tmpurl.append(extensions[i]);
 
+            // We do want to have the outfile with the extension though
             tmpoutfile = outfile;
             tmpoutfile.append(extensions[i]);
         }
@@ -138,7 +139,6 @@ std::vector<std::string> get_mta_data()
             // no dash for outfile though
             tmpoutfile = outfile;
             tmpoutfile.append(extensions[i]);
-
         }
 
         // Get time for file
