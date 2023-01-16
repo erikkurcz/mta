@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
 	// parse out	
 	int c;	
-	while((c = getopt(argc, argv, "n:s:d:D:r:l:v::f:")) != -1 )
+	while((c = getopt(argc, argv, "n::s:d:D:r:l:v::f:")) != -1 )
 	{
 		switch (c)
 		{
@@ -125,14 +125,11 @@ int main(int argc, char* argv[])
     // Get files from MTA here if no filename given
     if (args.new_data || args.filenames.size() == 0)
     {
-        if (!get_mta_data())
-        {
-            LOG4CXX_ERROR(main_logger, "Getting data from MTA...");
-        }
-        else
-        {
-            LOG4CXX_INFO(main_logger, "Getting data from MTA...");
-        }
+        LOG4CXX_INFO(main_logger, "Getting data from MTA...");
+        std::vector<std::string> newly_retrieved_files = get_mta_data();
+
+        // Extend the args.filenames var so we use the data we just retrieved
+        args.filenames.insert(args.filenames.end(), newly_retrieved_files.begin(), newly_retrieved_files.end());
     }
 
     // Parse stops.txt
@@ -170,26 +167,37 @@ int main(int argc, char* argv[])
         args.filenames.pop_back();
 
     }
-
-    // Find the trip with the most updates and print it
-    TripMap::TripMapIterator it;
-    TripMap::TripMapIterator trip_with_most_updates;
-    it = tm.begin();
     
-    size_t largest_seen = 0;
-    while (it != tm.end())
-    {
-        if (it->second.size() > largest_seen)
-        {
-            largest_seen = it->second.size();
-            trip_with_most_updates = it;
-        }
-        it++;
-    }
-    LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
-    LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
+    // If TripMap has size at all
+    if (tm.size() > 0){
 
-    query_tripmap(tm); 
+        // Find the trip with the most updates and print it
+        TripMap::TripMapIterator it;
+        TripMap::TripMapIterator trip_with_most_updates;
+        it = tm.begin();
+        
+        size_t largest_seen = 0;
+        while (it != tm.end())
+        {
+            if (it->second.size() > largest_seen)
+            {
+                largest_seen = it->second.size();
+                trip_with_most_updates = it;
+            }
+            it++;
+        }
+        LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
+        LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
+    }
+    
+    if (tm.size() > 0)
+    {
+        query_tripmap(tm); 
+    }
+    else
+    {
+        LOG4CXX_INFO(main_logger, "TripMap has no data in it! Nothing to query, exiting.");
+    }
 	return 0;
 }
 

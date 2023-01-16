@@ -31,7 +31,7 @@ bool get_data_for_mta_sites(StringMap* map_ptr, CURL*& handle)
 	while (iter != map_ptr->end())
 	{
 		// open output file
-		output_file = fopen(iter->second, "wb");
+		output_file = fopen(iter->second.c_str(), "wb");
 		if (!output_file)
 		{
 			curl_easy_cleanup(handle);
@@ -42,7 +42,7 @@ bool get_data_for_mta_sites(StringMap* map_ptr, CURL*& handle)
         // set up the source, destination, and API Key
         // This is done on a per-connection / per-header basis, so can't be done sooner
         curl_easy_setopt(handle, CURLOPT_WRITEDATA, output_file);
-        curl_easy_setopt(handle, CURLOPT_URL, iter->first);
+        curl_easy_setopt(handle, CURLOPT_URL, iter->first.c_str());
         
         // Set up api key in header
         struct curl_slist* header = NULL;
@@ -60,6 +60,7 @@ bool get_data_for_mta_sites(StringMap* map_ptr, CURL*& handle)
         curl_easy_setopt(handle, CURLOPT_HTTPHEADER, header);
 
         // Do the call
+        std::cout << "Getting data to file: " << iter->second << '\n';
 		rc = curl_easy_perform(handle);
 
 		// close out and flush
@@ -83,8 +84,11 @@ bool get_data_for_mta_sites(StringMap* map_ptr, CURL*& handle)
     return true;
 }
 
-bool get_mta_data(void)
+std::vector<std::string> get_mta_data()
 {
+    // Insert filenames into the vector given as we gather files
+    std::vector<std::string> output_files;
+
     // instantiation
     CURL* handle;
     curl_global_init(CURL_GLOBAL_ALL);
@@ -96,11 +100,6 @@ bool get_mta_data(void)
     // create the map of url:filename
     StringMap url_and_outfile;
 
-    // Fill it
-    std::string url;
-    url = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs";
-    std::string outfile = "data/gtfs_data_";
-
     std::vector<std::string> extensions;
     extensions.push_back("ace");
     extensions.push_back("bdfm");
@@ -109,8 +108,12 @@ bool get_mta_data(void)
     extensions.push_back("nqrw");
     extensions.push_back("l");
     extensions.push_back("si");
-    extensions.push_back("1234567");
+    //extensions.push_back("1234567");
 
+    // Fill it
+    std::string url;
+    url = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs";
+    std::string outfile = "data/gtfs_data_";
     std::string tmpurl;
     std::string tmpoutfile;
 
@@ -137,24 +140,30 @@ bool get_mta_data(void)
             tmpoutfile.append(extensions[i]);
 
         }
+
+        // Get time for file
         // YYYYMMDDHHMMSS date for filename
         std::time_t rawtime;
         std::tm* timeinfo;
-        char buffer[14];
+        char buffer[80];
 
         std::time(&rawtime);
         timeinfo = std::localtime(&rawtime);
 
-        std::strftime(buffer, 14,"%Y%m%d%H%M%S", timeinfo);
-        std::puts(buffer);
-
-        std::string curtime(buffer, 14);
+        std::strftime(buffer, sizeof(buffer),"%Y%m%d%H%M%S", timeinfo);
+        std::string curtime(buffer);
 
         tmpoutfile.append("_");
         tmpoutfile.append(curtime);
-        url_and_outfile.insert(StringMapPair(tmpurl.c_str(), tmpoutfile.c_str()));
-    }
 
+        // store it in the output vector
+        output_files.push_back(tmpoutfile);
+
+        // and in the map that will be used to retrieve data
+        // BUG: something is wrong here. Possibly writing different value to same key?
+        url_and_outfile.insert(StringMapPair(tmpurl, tmpoutfile));
+    }
+    
     // do the thing	
     bool rc = get_data_for_mta_sites(&url_and_outfile, handle);
 
@@ -165,6 +174,7 @@ bool get_mta_data(void)
     {
         std::cerr << "Problem during getting data for sites!" << std::endl;
     }
-    return rc == true;
+
+    return output_files;
 }
 
