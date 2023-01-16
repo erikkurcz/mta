@@ -3,14 +3,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <thread>
 #include <unistd.h>
 #include "log4cxx/logger.h" 
 #include "log4cxx/propertyconfigurator.h"
 
-#include "static_data_parser.hh"
 #include "file_parser.hh"
-#include "trip_map.hh"
+#include "retriever.hh"
+#include "static_data_parser.hh"
 #include "query_interface.hh"
+#include "trip_map.hh"
 #include "utils.hh"
 
 struct CLIArgs {
@@ -20,6 +22,7 @@ struct CLIArgs {
 	std::string log_config;	
     std::vector<std::string> filenames;	
 	std::string stops_txt_filename;	
+    bool daemon_mode;
 };
 
 std::ostream& operator<<(std::ostream& os, const struct CLIArgs& args)
@@ -45,6 +48,7 @@ static void show_usage(void)
 		  << "-r|--route [1|2|3|4|5|6|7|S|A|C|E|B|D|F|M|J|Z|G ... \n"
           << "-l|--log-config LOG_CONFIG_FILENAME\n"
           << "-f|--filename FILENAME\n"
+          << "[-D|--Daemon]"
           << "[-v|--verbose]"
 		  << std::endl; 
 }
@@ -54,6 +58,7 @@ log4cxx::LoggerPtr main_logger(log4cxx::Logger::getLogger("mta"));
 int main(int argc, char* argv[])
 {
 	CLIArgs args;
+    args.daemon_mode = false;
 	
 	// sanity check	
 	if (argc <= 1)
@@ -66,7 +71,7 @@ int main(int argc, char* argv[])
 
 	// parse out	
 	int c;	
-	while((c = getopt(argc, argv, "s:d:r:l:v::f:")) != -1 )
+	while((c = getopt(argc, argv, "s:d:D:r:l:v::f:")) != -1 )
 	{
 		switch (c)
 		{
@@ -93,6 +98,9 @@ int main(int argc, char* argv[])
 				break;
 			case 'v':
                 set_log_debug = true;
+				break;
+			case 'D':
+                args.daemon_mode = true;
 				break;
 		}
 	}
