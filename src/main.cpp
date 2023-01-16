@@ -39,6 +39,8 @@ std::ostream& operator<<(std::ostream& os, const struct CLIArgs& args)
     os << "stops_txt_filename = " << args.stops_txt_filename << ", ";
     os << "log_config = " << args.log_config << ", ";
     os << "data_filenames = ";
+    os << "daemon_mode= " << std::boolalpha << args.daemon_mode;
+    os << "new_data= " << std::boolalpha << args.new_data;
 
     for (int i = 0; i < args.filenames.size(); i++)
     {

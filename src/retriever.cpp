@@ -136,21 +136,22 @@ bool get_mta_data(void)
             tmpoutfile = outfile;
             tmpoutfile.append(extensions[i]);
 
-            // YYYYMMDDHHMMSS date for filename
-            std::time_t rawtime;
-            std::tm* timeinfo;
-            char buffer[14];
-
-            std::time(&rawtime);
-            timeinfo = std::localtime(&rawtime);
-
-            std::strftime(buffer, 14,"%Y%m%d%H%M%S", timeinfo);
-            std::puts(buffer);
-
-            std::string curtime(buffer, 14);
-
-            tmpoutfile.append(curtime);
         }
+        // YYYYMMDDHHMMSS date for filename
+        std::time_t rawtime;
+        std::tm* timeinfo;
+        char buffer[14];
+
+        std::time(&rawtime);
+        timeinfo = std::localtime(&rawtime);
+
+        std::strftime(buffer, 14,"%Y%m%d%H%M%S", timeinfo);
+        std::puts(buffer);
+
+        std::string curtime(buffer, 14);
+
+        tmpoutfile.append("_");
+        tmpoutfile.append(curtime);
         url_and_outfile.insert(StringMapPair(tmpurl.c_str(), tmpoutfile.c_str()));
     }
 
