@@ -108,7 +108,7 @@ std::vector<std::string> get_mta_data()
     extensions.push_back("nqrw");
     extensions.push_back("l");
     extensions.push_back("si");
-    //extensions.push_back("1234567");
+    extensions.push_back("1234567");
 
     // Fill it
     std::string url;
