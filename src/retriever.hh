@@ -1,3 +1,6 @@
+#ifndef MTA_RETRIEVER
+#define MTA_RETRIEVER
+
 // Testing out accessing the web via cpp
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,3 +19,6 @@ static size_t write_data(void* ptr, size_t size, size_t nmemb, void* stream);
 bool get_data_for_mta_sites(StringMap* map_ptr, CURL*& handle);
 
 bool get_mta_data(void);
+
+
+#endif // MTA_RETRIEVER header guard

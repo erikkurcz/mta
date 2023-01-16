@@ -1,10 +1,13 @@
 // Testing out accessing the web via cpp
 
+#include <cstdio>
+#include <ctime>
+
+#include <string>
+#include <vector>
+
 #include "retriever.hh"
 
-typedef std::map<const char*, const char*> StringMap;
-typedef std::pair<const char*, const char*> StringMapPair;
-typedef std::map<const char*, const char*>::iterator StringMapIter;
 
 static size_t write_data(void* ptr, size_t size, size_t nmemb, void* stream)
 {
@@ -92,7 +95,64 @@ bool get_mta_data(void)
 
     // create the map of url:filename
     StringMap url_and_outfile;
-    url_and_outfile.insert(StringMapPair("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm", "gtfs.bfdm.data"));
+
+    // Fill it
+    std::string url;
+    url = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs";
+    std::string outfile = "data/gtfs_data_";
+
+    std::vector<std::string> extensions;
+    extensions.push_back("ace");
+    extensions.push_back("bdfm");
+    extensions.push_back("g");
+    extensions.push_back("jz");
+    extensions.push_back("nqrw");
+    extensions.push_back("l");
+    extensions.push_back("si");
+    extensions.push_back("1234567");
+
+    std::string tmpurl;
+    std::string tmpoutfile;
+
+    for (int i = 0; i < extensions.size(); i++)
+    {
+        if (extensions[i] == std::string("1234567"))
+        {
+            // special case for 1234567, url does not have a '-' after gtfs
+            tmpurl = url;
+            tmpurl.append(extensions[i]);
+
+            tmpoutfile = outfile;
+            tmpoutfile.append(extensions[i]);
+        }
+        else
+        {
+            // this is no 1234567, so add a dash
+            tmpurl = url;
+            tmpurl.append("-");
+            tmpurl.append(extensions[i]);
+
+            // no dash for outfile though
+            tmpoutfile = outfile;
+            tmpoutfile.append(extensions[i]);
+
+            // YYYYMMDDHHMMSS date for filename
+            std::time_t rawtime;
+            std::tm* timeinfo;
+            char buffer[14];
+
+            std::time(&rawtime);
+            timeinfo = std::localtime(&rawtime);
+
+            std::strftime(buffer, 14,"%Y%m%d%H%M%S", timeinfo);
+            std::puts(buffer);
+
+            std::string curtime(buffer, 14);
+
+            tmpoutfile.append(curtime);
+        }
+        url_and_outfile.insert(StringMapPair(tmpurl.c_str(), tmpoutfile.c_str()));
+    }
 
     // do the thing	
     bool rc = get_data_for_mta_sites(&url_and_outfile, handle);

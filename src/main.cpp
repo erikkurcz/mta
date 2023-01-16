@@ -23,6 +23,12 @@ struct CLIArgs {
     std::vector<std::string> filenames;	
 	std::string stops_txt_filename;	
     bool daemon_mode;
+    bool new_data;
+
+    CLIArgs(){
+        daemon_mode = false;
+        new_data = false;
+    }
 };
 
 std::ostream& operator<<(std::ostream& os, const struct CLIArgs& args)
@@ -49,6 +55,7 @@ static void show_usage(void)
           << "-l|--log-config LOG_CONFIG_FILENAME\n"
           << "-f|--filename FILENAME\n"
           << "[-D|--Daemon]"
+          << "[-n|--new-data]"
           << "[-v|--verbose]"
 		  << std::endl; 
 }
@@ -58,7 +65,6 @@ log4cxx::LoggerPtr main_logger(log4cxx::Logger::getLogger("mta"));
 int main(int argc, char* argv[])
 {
 	CLIArgs args;
-    args.daemon_mode = false;
 	
 	// sanity check	
 	if (argc <= 1)
@@ -71,7 +77,7 @@ int main(int argc, char* argv[])
 
 	// parse out	
 	int c;	
-	while((c = getopt(argc, argv, "s:d:D:r:l:v::f:")) != -1 )
+	while((c = getopt(argc, argv, "n:s:d:D:r:l:v::f:")) != -1 )
 	{
 		switch (c)
 		{
@@ -102,6 +108,9 @@ int main(int argc, char* argv[])
 			case 'D':
                 args.daemon_mode = true;
 				break;
+			case 'n':
+                args.new_data = true;
+				break;
 		}
 	}
 
@@ -112,11 +121,17 @@ int main(int argc, char* argv[])
 
     LOG4CXX_INFO(main_logger, "Arguments given:" << args);
     // Get files from MTA here if no filename given
-    //if (!args.filename)
-    //{
-    //    // Get data from MTA here
-    //    std::cout << "Getting data from MTA..." << std::endl;
-    //}
+    if (args.new_data || args.filenames.size() == 0)
+    {
+        if (!get_mta_data())
+        {
+            LOG4CXX_ERROR(main_logger, "Getting data from MTA...");
+        }
+        else
+        {
+            LOG4CXX_INFO(main_logger, "Getting data from MTA...");
+        }
+    }
 
     // Parse stops.txt
     StaticData sd;
