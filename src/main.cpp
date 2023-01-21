@@ -3,14 +3,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <thread>
 #include <unistd.h>
 #include "log4cxx/logger.h" 
 #include "log4cxx/propertyconfigurator.h"
 
-#include "static_data_parser.hh"
 #include "file_parser.hh"
-#include "trip_map.hh"
+#include "retriever.hh"
+#include "static_data_parser.hh"
 #include "query_interface.hh"
+#include "trip_map.hh"
 #include "utils.hh"
 
 struct CLIArgs {
@@ -20,6 +22,13 @@ struct CLIArgs {
 	std::string log_config;	
     std::vector<std::string> filenames;	
 	std::string stops_txt_filename;	
+    bool daemon_mode;
+    bool new_data;
+
+    CLIArgs(){
+        daemon_mode = false;
+        new_data = false;
+    }
 };
 
 std::ostream& operator<<(std::ostream& os, const struct CLIArgs& args)
@@ -29,6 +38,8 @@ std::ostream& operator<<(std::ostream& os, const struct CLIArgs& args)
     os << "route = " << args.route << ", ";
     os << "stops_txt_filename = " << args.stops_txt_filename << ", ";
     os << "log_config = " << args.log_config << ", ";
+    os << "daemon_mode= " << std::boolalpha << args.daemon_mode << ", ";
+    os << "new_data= " << std::boolalpha << args.new_data << ", ";
     os << "data_filenames = ";
 
     for (int i = 0; i < args.filenames.size(); i++)
@@ -45,6 +56,8 @@ static void show_usage(void)
 		  << "-r|--route [1|2|3|4|5|6|7|S|A|C|E|B|D|F|M|J|Z|G ... \n"
           << "-l|--log-config LOG_CONFIG_FILENAME\n"
           << "-f|--filename FILENAME\n"
+          << "[-D|--Daemon]"
+          << "[-n|--new-data]"
           << "[-v|--verbose]"
 		  << std::endl; 
 }
@@ -66,7 +79,7 @@ int main(int argc, char* argv[])
 
 	// parse out	
 	int c;	
-	while((c = getopt(argc, argv, "s:d:r:l:v::f:")) != -1 )
+	while((c = getopt(argc, argv, "n::s:d:D:r:l:v::f:")) != -1 )
 	{
 		switch (c)
 		{
@@ -94,6 +107,12 @@ int main(int argc, char* argv[])
 			case 'v':
                 set_log_debug = true;
 				break;
+			case 'D':
+                args.daemon_mode = true;
+				break;
+			case 'n':
+                args.new_data = true;
+				break;
 		}
 	}
 
@@ -104,11 +123,14 @@ int main(int argc, char* argv[])
 
     LOG4CXX_INFO(main_logger, "Arguments given:" << args);
     // Get files from MTA here if no filename given
-    //if (!args.filename)
-    //{
-    //    // Get data from MTA here
-    //    std::cout << "Getting data from MTA..." << std::endl;
-    //}
+    if (args.new_data || args.filenames.size() == 0)
+    {
+        LOG4CXX_INFO(main_logger, "Getting data from MTA...");
+        std::vector<std::string> newly_retrieved_files = get_mta_data();
+
+        // Extend the args.filenames var so we use the data we just retrieved
+        args.filenames.insert(args.filenames.end(), newly_retrieved_files.begin(), newly_retrieved_files.end());
+    }
 
     // Parse stops.txt
     StaticData sd;
@@ -145,26 +167,37 @@ int main(int argc, char* argv[])
         args.filenames.pop_back();
 
     }
-
-    // Find the trip with the most updates and print it
-    TripMap::TripMapIterator it;
-    TripMap::TripMapIterator trip_with_most_updates;
-    it = tm.begin();
     
-    size_t largest_seen = 0;
-    while (it != tm.end())
-    {
-        if (it->second.size() > largest_seen)
-        {
-            largest_seen = it->second.size();
-            trip_with_most_updates = it;
-        }
-        it++;
-    }
-    LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
-    LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
+    // If TripMap has size at all
+    if (tm.size() > 0){
 
-    query_tripmap(tm); 
+        // Find the trip with the most updates and print it
+        TripMap::TripMapIterator it;
+        TripMap::TripMapIterator trip_with_most_updates;
+        it = tm.begin();
+        
+        size_t largest_seen = 0;
+        while (it != tm.end())
+        {
+            if (it->second.size() > largest_seen)
+            {
+                largest_seen = it->second.size();
+                trip_with_most_updates = it;
+            }
+            it++;
+        }
+        LOG4CXX_INFO(main_logger, "Trip with most updates: " << trip_with_most_updates->second);
+        LOG4CXX_INFO(main_logger, "Done parsing files, TripMap size: " << tm.size());
+    }
+    
+    if (tm.size() > 0)
+    {
+        query_tripmap(tm); 
+    }
+    else
+    {
+        LOG4CXX_INFO(main_logger, "TripMap has no data in it! Nothing to query, exiting.");
+    }
 	return 0;
 }
 
